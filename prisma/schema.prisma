@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Application models
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  // Fiscal data (Emisor)
+  rfc           String?
+  razonSocial   String?
+  regimenFiscal String?   @default("626")
+  codigoPostal  String?
+
+  // Bank details
+  bankName      String?
+  accountNumber String?
+  routingNumber String?
+  accountType   String?   @default("Checking")
+  bankCurrency  String?   @default("USD")
+  beneficiary   String?
+
+  // Email config
+  smtpHost      String?
+  smtpPort      Int?
+  smtpUser      String?
+  smtpPass      String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  invoices      Invoice[]
+  settings      UserSettings?
+}
+
+model UserSettings {
+  id                    String  @id @default(cuid())
+  userId                String  @unique
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Discord
+  discordWebhookUrl     String?
+  reminderEnabled       Boolean @default(true)
+  reminderDay           Int     @default(1)
+
+  // Default receptor data
+  defaultReceptorName   String?
+  defaultReceptorRfc    String?   @default("XEXX010101000")
+  defaultReceptorCp     String?
+  defaultResidenciaFiscal String? @default("USA")
+  defaultNumRegIdTrib   String?
+  defaultRegimenFiscalReceptor String? @default("616")
+  defaultUsoCfdi        String?   @default("S01")
+
+  // Default invoice data
+  defaultFormaPago      String?   @default("99")
+  defaultMetodoPago     String?   @default("PPD")
+  defaultMoneda         String?   @default("USD")
+  defaultClaveProdServ  String?   @default("81111810")
+  defaultClaveUnidad    String?   @default("E48")
+  defaultUnidad         String?   @default("Unidad de servicio")
+  defaultDescription    String?   @default("Professional software development services")
+  defaultRate           Float?    @default(3500)
+
+  // Theme
+  theme                 String    @default("dark")
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Invoice {
+  id              String    @id @default(cuid())
+  uuid            String    @unique @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Period
+  month           Int
+  year            Int
+
+  // CFDI fields
+  fecha           DateTime  @default(now())
+  formaPago       String    @default("99")
+  metodoPago      String    @default("PPD")
+  moneda          String    @default("USD")
+  tipoCambio      Float?
+  lugarExpedicion String?
+  exportacion     String    @default("01")
+  tipoComprobante String    @default("I")
+
+  // Receptor
+  receptorNombre  String?
+  receptorRfc     String    @default("XEXX010101000")
+  receptorCp      String?
+  residenciaFiscal String?  @default("USA")
+  numRegIdTrib    String?
+  regimenFiscalReceptor String? @default("616")
+  usoCfdi         String    @default("S01")
+
+  // Billed To (commercial invoice)
+  billedToName    String?
+  billedToAddress String?
+  billedToPhone   String?
+
+  // Totals
+  subtotal        Float     @default(0)
+  totalImpuestosTrasladados Float @default(0)
+  totalImpuestosRetenidos   Float @default(0)
+  total           Float     @default(0)
+
+  // Payment reference
+  paymentReference String?
+
+  // Status
+  status          String    @default("draft")
+
+  // Timbrado (PAC)
+  cfdiXml         String?
+  cfdiSelloCfd    String?
+  cfdiSelloSat    String?
+  cfdiFechaTimbrado String?
+  cfdiNoCertificadoSat String?
+  cfdiCadenaOriginal String?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  items           InvoiceItem[]
+  taxes           InvoiceTax[]
+
+  @@unique([userId, month, year])
+}
+
+model InvoiceItem {
+  id              String  @id @default(cuid())
+  invoiceId       String
+  invoice         Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  claveProdServ   String  @default("81111810")
+  cantidad        Float   @default(1)
+  claveUnidad     String  @default("E48")
+  unidad          String  @default("Unidad de servicio")
+  descripcion     String
+  valorUnitario   Float
+  importe         Float
+  objetoImp       String  @default("02")
+
+  createdAt       DateTime @default(now())
+}
+
+model InvoiceTax {
+  id              String  @id @default(cuid())
+  invoiceId       String
+  invoice         Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  tipo            String  // "traslado" or "retencion"
+  impuesto        String  // "002" (IVA) or "001" (ISR)
+  base            Float
+  tipoFactor      String  @default("Tasa")
+  tasaOCuota      Float   @default(0)
+  importe         Float   @default(0)
+}
