@@ -48,6 +48,7 @@ export async function createInvoiceAction(formData: FormData) {
     revalidatePath("/invoices");
     redirect(`/invoices/${invoice.id}`);
   } catch (e: any) {
+    if (e.message === "NEXT_REDIRECT") throw e;
     return { error: { _form: [e.message] } };
   }
 }

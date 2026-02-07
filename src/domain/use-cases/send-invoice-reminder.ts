@@ -19,9 +19,17 @@ export class SendInvoiceReminderUseCase {
     let sent = 0;
     let skipped = 0;
 
+    const today = new Date().getDate();
+
     for (const user of users) {
       const settings = await this.settingsRepo.findByUserId(user.id);
       if (!settings?.discordWebhookUrl) {
+        skipped++;
+        continue;
+      }
+
+      // Only send on the user's chosen reminder day
+      if (settings.reminderDay !== today) {
         skipped++;
         continue;
       }

@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest init:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(npx prisma db push:*)",
+      "Bash(npx next build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nComplete phases 1-7: full invoice management system\n\nImplements hexagonal architecture with Next.js 16, Prisma, shadcn/ui.\nIncludes CFDI 4.0 XML generation, PDF invoices, ZIP bundles, PAC\nintegration \\(Finkok/SW Sapien\\), Discord reminders with ASCII art,\nemail sending via SMTP, exchange rate from Banxico, and full CRUD\nwith auth \\(NextAuth v5 + Google\\). Adds loading skeletons, error\nboundaries, and not-found pages for polish.\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(npx auth secret:*)",
+      "WebSearch",
+      "WebFetch(domain:tienda.sw.com.mx)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout:*)",
+      "WebFetch(domain:www.dof.gob.mx)",
+      "WebFetch(domain:www.banxico.org.mx)",
+      "WebFetch(domain:open.er-api.com)"
+    ]
+  }
+}
