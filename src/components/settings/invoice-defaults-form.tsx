@@ -1,6 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { Users, Receipt, Loader2, Save } from "lucide-react";
+import { toast } from "sonner";
 import { updateSettingsAction } from "@/app/actions/settings-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,15 +35,20 @@ export function InvoiceDefaultsForm({ settings }: InvoiceDefaultsFormProps) {
     null,
   );
 
+  useEffect(() => {
+    if (state?.success) {
+      toast.success("Defaults updated successfully!");
+    }
+  }, [state]);
+
   return (
     <form action={formAction} className="space-y-6">
-      {state?.success && (
-        <p className="text-sm text-green-600">Defaults updated successfully!</p>
-      )}
-
       <Card>
         <CardHeader>
-          <CardTitle>Default Receptor</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" />
+            Default Receptor
+          </CardTitle>
           <CardDescription>Pre-filled when creating new invoices</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -78,7 +85,10 @@ export function InvoiceDefaultsForm({ settings }: InvoiceDefaultsFormProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Default Invoice Values</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Receipt className="h-5 w-5 text-primary" />
+            Default Invoice Values
+          </CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -117,7 +127,11 @@ export function InvoiceDefaultsForm({ settings }: InvoiceDefaultsFormProps) {
       </Card>
 
       <Button type="submit" disabled={isPending}>
-        {isPending ? "Saving..." : "Save Defaults"}
+        {isPending ? (
+          <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>
+        ) : (
+          <><Save className="h-4 w-4" /> Save Defaults</>
+        )}
       </Button>
     </form>
   );

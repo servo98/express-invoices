@@ -1,5 +1,9 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import {
+  CalendarDays, DollarSign, Activity, Zap,
+  Plus, Copy, FileText, ChevronRight,
+} from "lucide-react";
 import { requireUser } from "@/lib/auth-utils";
 import { container } from "@/infrastructure/di/container";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +31,8 @@ async function DashboardStats() {
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
+          <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <CalendarDays className="h-4 w-4" />
             Current Month
           </CardTitle>
         </CardHeader>
@@ -45,7 +50,8 @@ async function DashboardStats() {
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
+          <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <DollarSign className="h-4 w-4" />
             {currentYear} Total
           </CardTitle>
         </CardHeader>
@@ -59,7 +65,8 @@ async function DashboardStats() {
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
+          <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <Activity className="h-4 w-4" />
             Status
           </CardTitle>
         </CardHeader>
@@ -76,20 +83,21 @@ async function DashboardStats() {
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
+          <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <Zap className="h-4 w-4" />
             Quick Actions
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-2">
           <Button asChild size="sm">
-            <Link href="/invoices/new">New Invoice</Link>
+            <Link href="/invoices/new"><Plus className="h-4 w-4" /> New Invoice</Link>
           </Button>
           <form action={async () => {
             "use server";
             await cloneInvoiceAction();
           }}>
             <Button type="submit" variant="outline" size="sm" className="w-full">
-              Clone Latest
+              <Copy className="h-4 w-4" /> Clone Latest
             </Button>
           </form>
         </CardContent>
@@ -104,10 +112,14 @@ function StatsLoading() {
       {[...Array(4)].map((_, i) => (
         <Card key={i}>
           <CardHeader className="pb-2">
-            <Skeleton className="h-4 w-24" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-4 rounded-full" />
+              <Skeleton className="h-4 w-24" />
+            </div>
           </CardHeader>
           <CardContent>
-            <Skeleton className="h-8 w-32" />
+            <Skeleton className="h-8 w-28" />
+            <Skeleton className="mt-1 h-3 w-20" />
           </CardContent>
         </Card>
       ))}
@@ -124,9 +136,10 @@ async function RecentInvoices() {
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-10">
-          <p className="text-muted-foreground">No invoices yet</p>
+          <FileText className="h-12 w-12 text-muted-foreground/50" />
+          <p className="mt-3 text-muted-foreground">No invoices yet</p>
           <Button asChild className="mt-4">
-            <Link href="/invoices/new">Create your first invoice</Link>
+            <Link href="/invoices/new"><Plus className="h-4 w-4" /> Create your first invoice</Link>
           </Button>
         </CardContent>
       </Card>
@@ -154,13 +167,16 @@ async function RecentInvoices() {
                   {invoice.receptorNombre || invoice.billedToName || "—"}
                 </p>
               </div>
-              <div className="text-right">
-                <p className="font-medium">
-                  {formatCurrency(invoice.total, invoice.moneda)}
-                </p>
-                <Badge variant={invoice.status === "draft" ? "secondary" : "default"} className="text-xs">
-                  {invoice.status}
-                </Badge>
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <p className="font-medium">
+                    {formatCurrency(invoice.total, invoice.moneda)}
+                  </p>
+                  <Badge variant={invoice.status === "draft" ? "secondary" : "default"} className="text-xs">
+                    {invoice.status}
+                  </Badge>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </div>
             </Link>
           ))}
@@ -179,7 +195,16 @@ function RecentLoading() {
       <CardContent>
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <Skeleton key={i} className="h-16 w-full" />
+            <div key={i} className="flex items-center justify-between rounded-lg border p-3">
+              <div className="space-y-1.5">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-3 w-36" />
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-5 w-14 rounded-full" />
+              </div>
+            </div>
           ))}
         </div>
       </CardContent>

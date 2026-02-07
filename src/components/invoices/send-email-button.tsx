@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Mail, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,6 +39,7 @@ export function SendEmailButton({ invoiceId, hasSmtp }: { invoiceId: string; has
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" disabled={!hasSmtp}>
+          <Mail className="h-4 w-4" />
           {hasSmtp ? "Send Email" : "Email (configure SMTP)"}
         </Button>
       </DialogTrigger>
@@ -71,7 +73,11 @@ export function SendEmailButton({ invoiceId, hasSmtp }: { invoiceId: string; has
             <p className="text-sm text-destructive">{result.error}</p>
           )}
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Sending..." : "Send"}
+            {loading ? (
+              <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</>
+            ) : (
+              <><Send className="h-4 w-4" /> Send</>
+            )}
           </Button>
         </form>
       </DialogContent>

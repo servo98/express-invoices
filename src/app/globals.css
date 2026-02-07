@@ -150,6 +150,12 @@
   --sidebar-ring: oklch(0.6 0.2 350);
 }
 
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

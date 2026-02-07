@@ -1,6 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { Building, Landmark, Mail, Loader2, Save } from "lucide-react";
+import { toast } from "sonner";
 import { updateProfileAction } from "@/app/actions/settings-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,15 +35,20 @@ export function ProfileForm({ user }: ProfileFormProps) {
     null,
   );
 
+  useEffect(() => {
+    if (state?.success) {
+      toast.success("Profile updated successfully!");
+    }
+  }, [state]);
+
   return (
     <form action={formAction} className="space-y-6">
-      {state?.success && (
-        <p className="text-sm text-green-600">Profile updated successfully!</p>
-      )}
-
       <Card>
         <CardHeader>
-          <CardTitle>Fiscal Information (Emisor)</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Building className="h-5 w-5 text-primary" />
+            Fiscal Information (Emisor)
+          </CardTitle>
           <CardDescription>Your tax identification for CFDI generation</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -70,7 +77,10 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Bank Details</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Landmark className="h-5 w-5 text-primary" />
+            Bank Details
+          </CardTitle>
           <CardDescription>Payment information shown on commercial invoices</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -103,7 +113,10 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Email Configuration (SMTP)</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Mail className="h-5 w-5 text-primary" />
+            Email Configuration (SMTP)
+          </CardTitle>
           <CardDescription>Configure to send invoices from your own email</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -127,7 +140,11 @@ export function ProfileForm({ user }: ProfileFormProps) {
       </Card>
 
       <Button type="submit" disabled={isPending}>
-        {isPending ? "Saving..." : "Save Profile"}
+        {isPending ? (
+          <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>
+        ) : (
+          <><Save className="h-4 w-4" /> Save Profile</>
+        )}
       </Button>
     </form>
   );

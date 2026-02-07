@@ -1,6 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { MessageCircle, Bell, Calendar, Loader2, Save } from "lucide-react";
+import { toast } from "sonner";
 import { updateSettingsAction } from "@/app/actions/settings-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,15 +24,20 @@ export function DiscordForm({ settings }: DiscordFormProps) {
     null,
   );
 
+  useEffect(() => {
+    if (state?.success) {
+      toast.success("Discord settings updated!");
+    }
+  }, [state]);
+
   return (
     <form action={formAction} className="space-y-6">
-      {state?.success && (
-        <p className="text-sm text-green-600">Discord settings updated!</p>
-      )}
-
       <Card>
         <CardHeader>
-          <CardTitle>Discord Notifications</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5 text-primary" />
+            Discord Notifications
+          </CardTitle>
           <CardDescription>
             Get invoice reminders with ASCII art memes in your Discord channel
           </CardDescription>
@@ -49,10 +56,16 @@ export function DiscordForm({ settings }: DiscordFormProps) {
               name="reminderEnabled"
               defaultChecked={settings?.reminderEnabled ?? true}
             />
-            <Label>Enable monthly reminders</Label>
+            <Label className="flex items-center gap-1.5">
+              <Bell className="h-4 w-4 text-muted-foreground" />
+              Enable monthly reminders
+            </Label>
           </div>
           <div>
-            <Label>Reminder Day (1-28)</Label>
+            <Label className="flex items-center gap-1.5">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              Reminder Day (1-28)
+            </Label>
             <Input
               name="reminderDay"
               type="number"
@@ -65,7 +78,11 @@ export function DiscordForm({ settings }: DiscordFormProps) {
       </Card>
 
       <Button type="submit" disabled={isPending}>
-        {isPending ? "Saving..." : "Save Discord Settings"}
+        {isPending ? (
+          <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>
+        ) : (
+          <><Save className="h-4 w-4" /> Save Discord Settings</>
+        )}
       </Button>
     </form>
   );

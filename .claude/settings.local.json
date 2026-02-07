@@ -20,7 +20,9 @@
       "Bash(timeout:*)",
       "WebFetch(domain:www.dof.gob.mx)",
       "WebFetch(domain:www.banxico.org.mx)",
-      "WebFetch(domain:open.er-api.com)"
+      "WebFetch(domain:open.er-api.com)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nFix NEXT_REDIRECT bug, respect user reminderDay, improve docs\n\n- Fix createInvoiceAction swallowing NEXT_REDIRECT error \\(showed error instead of redirecting\\)\n- Run cron daily and filter by each user''s reminderDay setting\n- Update CLAUDE.md with architecture details and gotchas\n- Improve exchange rate service with Banxico token + fallback\n- Simplify middleware to cookie-based auth check\n- Redirect landing page to dashboard\n- Add README with setup instructions\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(find:*)"
     ]
   }
 }

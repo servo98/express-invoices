@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,7 +35,7 @@ export function DeleteInvoiceButton({ invoiceId }: { invoiceId: string }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="destructive" size="sm">
-          Delete
+          <Trash2 className="h-4 w-4" /> Delete
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -49,7 +50,11 @@ export function DeleteInvoiceButton({ invoiceId }: { invoiceId: string }) {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
-            {deleting ? "Deleting..." : "Delete"}
+            {deleting ? (
+              <><Loader2 className="h-4 w-4 animate-spin" /> Deleting...</>
+            ) : (
+              <><Trash2 className="h-4 w-4" /> Delete</>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

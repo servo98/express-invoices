@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Stamp, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { timbrarInvoiceAction } from "@/app/actions/invoice-actions";
 
@@ -28,7 +29,11 @@ export function TimbrarButton({ invoiceId, disabled }: { invoiceId: string; disa
         variant="default"
         size="sm"
       >
-        {loading ? "Timbrando..." : "Timbrar CFDI"}
+        {loading ? (
+          <><Loader2 className="h-4 w-4 animate-spin" /> Timbrando...</>
+        ) : (
+          <><Stamp className="h-4 w-4" /> Timbrar CFDI</>
+        )}
       </Button>
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { Plus, FileText, CalendarDays } from "lucide-react";
 import { requireUser } from "@/lib/auth-utils";
 import { container } from "@/infrastructure/di/container";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,9 +23,10 @@ async function InvoicesList({ year }: { year: number }) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-10">
-          <p className="text-muted-foreground">No invoices for {year}</p>
+          <FileText className="h-12 w-12 text-muted-foreground/50" />
+          <p className="mt-3 text-muted-foreground">No invoices for {year}</p>
           <Button asChild className="mt-4">
-            <Link href="/invoices/new">Create Invoice</Link>
+            <Link href="/invoices/new"><Plus className="h-4 w-4" /> Create Invoice</Link>
           </Button>
         </CardContent>
       </Card>
@@ -38,7 +40,8 @@ async function InvoicesList({ year }: { year: number }) {
           <Card className="transition-colors hover:bg-accent">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base">
+                <CardTitle className="flex items-center gap-1.5 text-base">
+                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
                   {formatMonthYear({ month: invoice.month, year: invoice.year })}
                 </CardTitle>
                 <Badge variant={invoice.status === "draft" ? "secondary" : "default"}>
@@ -69,12 +72,19 @@ function InvoicesLoading() {
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {[...Array(6)].map((_, i) => (
         <Card key={i}>
-          <CardHeader>
-            <Skeleton className="h-5 w-32" />
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Skeleton className="h-4 w-4 rounded" />
+                <Skeleton className="h-5 w-28" />
+              </div>
+              <Skeleton className="h-5 w-14 rounded-full" />
+            </div>
           </CardHeader>
           <CardContent>
-            <Skeleton className="h-8 w-24" />
-            <Skeleton className="mt-2 h-4 w-40" />
+            <Skeleton className="h-7 w-24" />
+            <Skeleton className="mt-2 h-3 w-32" />
+            <Skeleton className="mt-1 h-3 w-24" />
           </CardContent>
         </Card>
       ))}
@@ -92,10 +102,10 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold">Invoices</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <MonthYearPicker year={year} />
           <Button asChild>
-            <Link href="/invoices/new">New Invoice</Link>
+            <Link href="/invoices/new"><Plus className="h-4 w-4" /> New Invoice</Link>
           </Button>
         </div>
       </div>
