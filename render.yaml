@@ -27,8 +27,8 @@ services:
       - key: AUTH_DISCORD_SECRET
         sync: false
       - key: NEXT_PUBLIC_APP_URL
-        sync: false
-      - key: BANXICO_TOKEN
-        sync: false
+        value: "https://express-invoices.onrender.com"
+      - key: AUTH_TRUST_HOST
+        value: "true"
       - key: CRON_SECRET
         generateValue: true
