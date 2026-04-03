@@ -9,8 +9,8 @@ services:
     plan: free
     name: express-invoices
     runtime: node
-    buildCommand: npm install && npx prisma generate && npx prisma db push && npm run build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public
-    startCommand: node .next/standalone/server.js
+    buildCommand: npm install && npx prisma generate && npx prisma db push && npm run build
+    startCommand: npx next start -H 0.0.0.0 -p $PORT
     envVars:
       - key: NODE_ENV
         value: production
