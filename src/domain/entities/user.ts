@@ -4,6 +4,9 @@ export interface User {
   email: string | null;
   image: string | null;
 
+  // Role
+  role: string; // "freelancer" | "accountant"
+
   // Fiscal data (Emisor)
   rfc: string | null;
   razonSocial: string | null;

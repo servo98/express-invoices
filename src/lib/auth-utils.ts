@@ -20,3 +20,15 @@ export async function requireUser() {
   if (!user) redirect("/login");
   return user;
 }
+
+export async function requireFreelancer() {
+  const user = await requireUser();
+  if (user.role !== "freelancer") redirect("/dashboard");
+  return user;
+}
+
+export async function requireAccountant() {
+  const user = await requireUser();
+  if (user.role !== "accountant") redirect("/dashboard");
+  return user;
+}

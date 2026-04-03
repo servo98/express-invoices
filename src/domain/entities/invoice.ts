@@ -73,6 +73,10 @@ export interface Invoice {
   cfdiNoCertificadoSat: string | null;
   cfdiCadenaOriginal: string | null;
 
+  // Upload flow
+  timbradoPdf: Buffer | null;
+  uploadedBy: string | null;
+
   // Relations
   items: InvoiceItem[];
   taxes: InvoiceTax[];
@@ -103,11 +107,14 @@ export interface CreateInvoiceInput {
   billedToAddress?: string;
   billedToPhone?: string;
   paymentReference?: string;
+  timbradoPdf?: Buffer;
+  uploadedBy?: string;
   items: Omit<InvoiceItem, "id">[];
 }
 
 export interface UpdateInvoiceInput extends Partial<CreateInvoiceInput> {
   id: string;
+  uuid?: string;
   status?: InvoiceStatus;
   cfdiXml?: string | null;
   cfdiSelloCfd?: string | null;

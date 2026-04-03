@@ -26,6 +26,13 @@ export interface UserSettings {
   defaultDescription: string | null;
   defaultRate: number | null;
 
+  // Commercial invoice defaults (Billed To)
+  defaultBilledToName: string | null;
+  defaultBilledToAddress: string | null;
+  defaultBilledToPhone: string | null;
+  defaultDescriptionEn: string | null;
+  clientEmail: string | null;
+
   // Theme
   theme: string;
 }
@@ -50,5 +57,10 @@ export interface UpdateSettingsInput {
   defaultUnidad?: string;
   defaultDescription?: string;
   defaultRate?: number;
+  defaultBilledToName?: string;
+  defaultBilledToAddress?: string;
+  defaultBilledToPhone?: string;
+  defaultDescriptionEn?: string;
+  clientEmail?: string;
   theme?: string;
 }

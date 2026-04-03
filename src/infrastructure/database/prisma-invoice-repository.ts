@@ -8,6 +8,7 @@ function mapInvoice(raw: any): Invoice {
   return {
     ...raw,
     status: raw.status as Invoice["status"],
+    timbradoPdf: raw.timbradoPdf ? Buffer.from(raw.timbradoPdf) : null,
     items: raw.items || [],
     taxes: raw.taxes || [],
   };
@@ -81,6 +82,8 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
         totalImpuestosRetenidos: 0,
         total: subtotal,
         paymentReference: input.paymentReference,
+        timbradoPdf: input.timbradoPdf ? new Uint8Array(input.timbradoPdf) : undefined,
+        uploadedBy: input.uploadedBy,
         items: {
           create: input.items,
         },
@@ -114,7 +117,6 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
   async update(input: UpdateInvoiceInput): Promise<Invoice> {
     const { id, items, ...data } = input;
 
-    // If items provided, recalculate totals
     let updateData: any = { ...data };
     if (items) {
       const subtotal = items.reduce((sum, item) => sum + item.importe, 0);
@@ -122,13 +124,11 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
       updateData.total = subtotal;
     }
 
-    // Remove undefined values
     Object.keys(updateData).forEach(
       (key) => updateData[key] === undefined && delete updateData[key],
     );
 
     if (items) {
-      // Delete existing items and taxes, recreate
       await db.invoiceItem.deleteMany({ where: { invoiceId: id } });
       await db.invoiceTax.deleteMany({ where: { invoiceId: id } });
 
@@ -184,5 +184,31 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
       orderBy: [{ year: "desc" }, { month: "desc" }],
     });
     return result ? mapInvoice(result) : null;
+  }
+
+  // Unscoped methods for accountant access
+  async findByIdUnscoped(id: string): Promise<Invoice | null> {
+    const result = await db.invoice.findUnique({
+      where: { id },
+      include: includeRelations,
+    });
+    return result ? mapInvoice(result) : null;
+  }
+
+  async findAllUnscoped(): Promise<Invoice[]> {
+    const results = await db.invoice.findMany({
+      include: { ...includeRelations, user: true },
+      orderBy: [{ year: "desc" }, { month: "desc" }],
+    });
+    return results.map(mapInvoice);
+  }
+
+  async findAllByYearUnscoped(year: number): Promise<Invoice[]> {
+    const results = await db.invoice.findMany({
+      where: { year },
+      include: { ...includeRelations, user: true },
+      orderBy: { month: "desc" },
+    });
+    return results.map(mapInvoice);
   }
 }

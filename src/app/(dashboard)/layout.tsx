@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { SidebarNav, BottomNav } from "@/components/layout/sidebar-nav";
 import { UserMenu } from "@/components/layout/user-menu";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -12,11 +13,18 @@ export default async function DashboardLayout({
   const session = await auth();
   if (!session?.user) redirect("/login");
 
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true },
+  });
+
+  const role = user?.role || "freelancer";
+
   return (
     <div className="flex min-h-screen overflow-x-hidden">
       {/* Desktop Sidebar */}
       <aside className="hidden w-64 shrink-0 border-r bg-card md:block">
-        <SidebarNav />
+        <SidebarNav role={role} />
       </aside>
 
       {/* Main Content */}
@@ -36,7 +44,7 @@ export default async function DashboardLayout({
       </div>
 
       {/* Mobile bottom nav */}
-      <BottomNav />
+      <BottomNav role={role} />
     </div>
   );
 }

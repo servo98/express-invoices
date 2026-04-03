@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { container } from "@/infrastructure/di/container";
 
 export async function GET(
@@ -14,7 +15,14 @@ export async function GET(
   const { id } = await params;
 
   try {
-    const zip = await container.downloadBundle.execute(id, session.user.id);
+    const user = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true },
+    });
+
+    const zip = user?.role === "accountant"
+      ? await container.downloadBundle.executeUnscoped(id)
+      : await container.downloadBundle.execute(id, session.user.id);
 
     return new NextResponse(new Uint8Array(zip), {
       headers: {

@@ -3,16 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, FileText, Settings } from "lucide-react";
+import { LayoutDashboard, FileText, Settings, Shield } from "lucide-react";
 
-const navItems = [
+const freelancerNav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/invoices", label: "Invoices", icon: FileText },
   { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/admin", label: "Admin", icon: Shield },
 ];
 
-export function SidebarNav() {
+const accountantNav = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/invoices", label: "Invoices", icon: FileText },
+];
+
+export function SidebarNav({ role = "freelancer" }: { role?: string }) {
   const pathname = usePathname();
+  const navItems = role === "accountant" ? accountantNav : freelancerNav;
 
   return (
     <nav className="flex flex-col gap-1 p-4">
@@ -42,8 +49,9 @@ export function SidebarNav() {
   );
 }
 
-export function BottomNav() {
+export function BottomNav({ role = "freelancer" }: { role?: string }) {
   const pathname = usePathname();
+  const navItems = role === "accountant" ? accountantNav : freelancerNav;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background md:hidden">

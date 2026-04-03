@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
-  Pencil, FileText, FileCode, Download, Copy, Stamp,
+  FileText, FileCode, Download, Stamp,
   Mail, Trash2, CreditCard, Building2, Package,
-  Receipt, ArrowLeft, MoreHorizontal,
+  Receipt, ArrowLeft, Upload,
 } from "lucide-react";
 import { requireUser } from "@/lib/auth-utils";
 import { container } from "@/infrastructure/di/container";
@@ -11,18 +11,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { formatCurrency } from "@/domain/value-objects/money";
 import { formatMonthYear } from "@/domain/value-objects/month-year";
 import { DeleteInvoiceButton } from "@/components/invoices/delete-invoice-button";
-import { TimbrarButton } from "@/components/invoices/timbrar-button";
 import { SendEmailButton } from "@/components/invoices/send-email-button";
-import { cloneInvoiceAction } from "@/app/actions/invoice-actions";
 
 interface InvoiceDetailPageProps {
   params: Promise<{ id: string }>;
@@ -37,7 +29,11 @@ const statusVariant: Record<string, "default" | "secondary" | "destructive"> = {
 export default async function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   const user = await requireUser();
   const { id } = await params;
-  const invoice = await container.getInvoice.byId(id, user.id);
+
+  // Accountants can see any invoice, freelancers only their own
+  const invoice = user.role === "accountant"
+    ? await container.invoiceRepo.findByIdUnscoped(id)
+    : await container.getInvoice.byId(id, user.id);
 
   if (!invoice) notFound();
 
@@ -64,70 +60,39 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
         </Badge>
       </div>
 
+      {/* Upload info */}
+      {invoice.uploadedBy && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Upload className="h-4 w-4" />
+          Uploaded by accountant
+        </div>
+      )}
+
       {/* Actions */}
       <div className="flex flex-wrap items-center gap-2">
         <Button asChild variant="outline" size="sm">
-          <Link href={`/invoices/${id}/edit`}>
-            <Pencil className="h-4 w-4" /> Edit
-          </Link>
-        </Button>
-        <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
           <a href={`/api/invoices/${id}/pdf`} target="_blank" rel="noopener">
             <FileText className="h-4 w-4" /> View PDF
           </a>
         </Button>
-        <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
-          <a href={`/api/invoices/${id}/xml`} target="_blank" rel="noopener">
-            <FileCode className="h-4 w-4" /> View XML
-          </a>
-        </Button>
+        {invoice.cfdiXml && (
+          <Button asChild variant="outline" size="sm">
+            <a href={`/api/invoices/${id}/xml`} target="_blank" rel="noopener">
+              <FileCode className="h-4 w-4" /> View XML
+            </a>
+          </Button>
+        )}
         <Button asChild size="sm">
           <a href={`/api/invoices/${id}/bundle`} download>
             <Download className="h-4 w-4" /> Download ZIP
           </a>
         </Button>
-        <form className="hidden sm:block" action={async () => {
-          "use server";
-          await cloneInvoiceAction(id);
-        }}>
-          <Button type="submit" variant="outline" size="sm">
-            <Copy className="h-4 w-4" /> Clone to Next Month
-          </Button>
-        </form>
-        <TimbrarButton invoiceId={id} disabled={invoice.status === "timbrado"} />
-        <SendEmailButton invoiceId={id} hasSmtp={!!user.smtpHost} />
-        <DeleteInvoiceButton invoiceId={id} />
-
-        {/* Mobile overflow menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="sm:hidden">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem asChild>
-              <a href={`/api/invoices/${id}/pdf`} target="_blank" rel="noopener">
-                <FileText className="mr-2 h-4 w-4" /> View PDF
-              </a>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <a href={`/api/invoices/${id}/xml`} target="_blank" rel="noopener">
-                <FileCode className="mr-2 h-4 w-4" /> View XML
-              </a>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <form action={async () => {
-                "use server";
-                await cloneInvoiceAction(id);
-              }}>
-                <button type="submit" className="flex w-full items-center">
-                  <Copy className="mr-2 h-4 w-4" /> Clone to Next Month
-                </button>
-              </form>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {user.role === "freelancer" && (
+          <>
+            <SendEmailButton invoiceId={id} hasSmtp={!!user.smtpHost} />
+            <DeleteInvoiceButton invoiceId={id} />
+          </>
+        )}
       </div>
 
       {/* CFDI Details */}

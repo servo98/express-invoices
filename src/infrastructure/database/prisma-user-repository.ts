@@ -26,4 +26,22 @@ export class PrismaUserRepository implements UserRepository {
       },
     });
   }
+
+  async findAll(): Promise<User[]> {
+    return db.user.findMany({ orderBy: { name: "asc" } });
+  }
+
+  async findAllFreelancers(): Promise<User[]> {
+    return db.user.findMany({
+      where: { role: "freelancer" },
+      orderBy: { name: "asc" },
+    });
+  }
+
+  async updateRole(userId: string, role: string): Promise<User> {
+    return db.user.update({
+      where: { id: userId },
+      data: { role },
+    });
+  }
 }

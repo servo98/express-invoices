@@ -22,7 +22,10 @@
       "WebFetch(domain:www.banxico.org.mx)",
       "WebFetch(domain:open.er-api.com)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nFix NEXT_REDIRECT bug, respect user reminderDay, improve docs\n\n- Fix createInvoiceAction swallowing NEXT_REDIRECT error \\(showed error instead of redirecting\\)\n- Run cron daily and filter by each user''s reminderDay setting\n- Update CLAUDE.md with architecture details and gotchas\n- Improve exchange rate service with Banxico token + fallback\n- Simplify middleware to cookie-based auth check\n- Redirect landing page to dashboard\n- Add README with setup instructions\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: migrate to PostgreSQL \\(Neon\\) for Vercel deployment\n\n- Switch Prisma provider from SQLite to PostgreSQL\n- Add initial migration \\(20260207000000_init\\)\n- Build script runs prisma migrate deploy before next build\n- Add postinstall script for Prisma client generation\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(find \"C:\\\\Users\\\\ferna\\\\Documents\\\\code\\\\express-invoices\\\\src\\\\app\\\\\\(auth\\)\" -type f -name \"*.tsx\" -o -name \"*.ts\" 2>/dev/null)",
+      "Bash(cat \"/c/Users/ferna/Documents/code/express-invoices/src/app/\\(dashboard\\)/invoices/page.tsx\")"
     ]
   }
 }

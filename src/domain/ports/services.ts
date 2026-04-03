@@ -5,10 +5,6 @@ export interface PdfGenerator {
   generate(invoice: Invoice, user: User): Promise<Buffer>;
 }
 
-export interface CfdiXmlGenerator {
-  generate(invoice: Invoice, user: User): string;
-}
-
 export interface ZipPackager {
   createBundle(files: { name: string; data: Buffer | string }[]): Promise<Buffer>;
 }
@@ -40,18 +36,74 @@ export interface EmailService {
   }): Promise<void>;
 }
 
-export interface PacTimbradoResult {
-  xml: string;
+export interface ParsedCfdiItem {
+  claveProdServ: string;
+  cantidad: number;
+  claveUnidad: string;
+  unidad: string;
+  descripcion: string;
+  valorUnitario: number;
+  importe: number;
+  objetoImp: string;
+}
+
+export interface ParsedCfdiTax {
+  tipo: "traslado" | "retencion";
+  impuesto: string;
+  base: number;
+  tipoFactor: string;
+  tasaOCuota: number;
+  importe: number;
+}
+
+export interface ParsedCfdi {
+  // Comprobante
+  fecha: string;
+  folio: string | null;
+  serie: string | null;
+  subtotal: number;
+  total: number;
+  moneda: string;
+  tipoCambio: number | null;
+  formaPago: string;
+  metodoPago: string;
+  lugarExpedicion: string | null;
+  tipoComprobante: string;
+  exportacion: string;
+
+  // Emisor
+  emisorRfc: string;
+  emisorNombre: string;
+  emisorRegimenFiscal: string;
+
+  // Receptor
+  receptorRfc: string;
+  receptorNombre: string;
+  receptorResidenciaFiscal: string | null;
+  receptorNumRegIdTrib: string | null;
+  receptorRegimenFiscalReceptor: string | null;
+  receptorUsoCfdi: string;
+
+  // Items
+  items: ParsedCfdiItem[];
+
+  // Taxes
+  totalImpuestosTrasladados: number;
+  totalImpuestosRetenidos: number;
+  taxes: ParsedCfdiTax[];
+
+  // Timbre Fiscal Digital
   uuid: string;
   fechaTimbrado: string;
   selloCfd: string;
   selloSat: string;
   noCertificadoSat: string;
   cadenaOriginal: string;
+
+  // Full XML
+  xmlContent: string;
 }
 
-export interface PacService {
-  timbrar(xmlBase: string): Promise<PacTimbradoResult>;
-  cancelar(uuid: string, rfcEmisor: string, motivo: string): Promise<{ success: boolean; message: string }>;
-  isConfigured(): boolean;
+export interface CfdiXmlParser {
+  parse(xmlContent: string): ParsedCfdi;
 }

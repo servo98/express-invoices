@@ -1,13 +1,14 @@
-import { User, FileText, MessageCircle } from "lucide-react";
-import { requireUser } from "@/lib/auth-utils";
+import { User, FileText, MessageCircle, Building2 } from "lucide-react";
+import { requireFreelancer } from "@/lib/auth-utils";
 import { db } from "@/lib/db";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileForm } from "@/components/settings/profile-form";
 import { InvoiceDefaultsForm } from "@/components/settings/invoice-defaults-form";
 import { DiscordForm } from "@/components/settings/discord-form";
+import { ClientDefaultsForm } from "@/components/settings/client-defaults-form";
 
 export default async function SettingsPage() {
-  const user = await requireUser();
+  const user = await requireFreelancer();
   const settings = await db.userSettings.findUnique({
     where: { userId: user.id },
   });
@@ -22,6 +23,10 @@ export default async function SettingsPage() {
             <User className="mr-1.5 h-4 w-4" />
             <span className="hidden sm:inline">Profile & </span>Fiscal
           </TabsTrigger>
+          <TabsTrigger value="client" className="text-xs sm:text-sm">
+            <Building2 className="mr-1.5 h-4 w-4" />
+            Client
+          </TabsTrigger>
           <TabsTrigger value="defaults" className="text-xs sm:text-sm">
             <FileText className="mr-1.5 h-4 w-4" />
             <span className="hidden sm:inline">Invoice </span>Defaults
@@ -34,6 +39,10 @@ export default async function SettingsPage() {
 
         <TabsContent value="profile" className="mt-6">
           <ProfileForm user={user} />
+        </TabsContent>
+
+        <TabsContent value="client" className="mt-6">
+          <ClientDefaultsForm settings={settings} />
         </TabsContent>
 
         <TabsContent value="defaults" className="mt-6">

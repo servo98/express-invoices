@@ -1,13 +1,12 @@
 import type { InvoiceRepository } from "@/domain/ports/invoice-repository";
 import type { UserRepository } from "@/domain/ports/user-repository";
-import type { PdfGenerator, CfdiXmlGenerator, ZipPackager } from "@/domain/ports/services";
+import type { PdfGenerator, ZipPackager } from "@/domain/ports/services";
 
 export class DownloadInvoiceBundleUseCase {
   constructor(
     private invoiceRepo: InvoiceRepository,
     private userRepo: UserRepository,
     private pdfGenerator: PdfGenerator,
-    private xmlGenerator: CfdiXmlGenerator,
     private zipPackager: ZipPackager,
   ) {}
 
@@ -20,16 +19,41 @@ export class DownloadInvoiceBundleUseCase {
     if (!invoice) throw new Error("Invoice not found");
     if (!user) throw new Error("User not found");
 
-    const [pdf, xml] = await Promise.all([
-      this.pdfGenerator.generate(invoice, user),
-      Promise.resolve(this.xmlGenerator.generate(invoice, user)),
-    ]);
+    // Generate commercial PDF
+    const commercialPdf = await this.pdfGenerator.generate(invoice, user);
+    const baseName = invoice.uuid;
 
-    const baseName = `${invoice.uuid}`;
+    const files: { name: string; data: Buffer | string }[] = [];
 
-    return this.zipPackager.createBundle([
-      { name: `${baseName}.pdf`, data: pdf },
-      { name: `${baseName}.xml`, data: xml },
-    ]);
+    // Include timbrado PDF if available (uploaded by accountant)
+    if (invoice.timbradoPdf) {
+      files.push({ name: `${baseName}_timbrado.pdf`, data: invoice.timbradoPdf });
+    }
+
+    // Always include commercial PDF
+    files.push({ name: `${baseName}_commercial.pdf`, data: commercialPdf });
+
+    return this.zipPackager.createBundle(files);
+  }
+
+  async executeUnscoped(invoiceId: string): Promise<Buffer> {
+    const invoice = await this.invoiceRepo.findByIdUnscoped(invoiceId);
+    if (!invoice) throw new Error("Invoice not found");
+
+    const user = await this.userRepo.findById(invoice.userId);
+    if (!user) throw new Error("User not found");
+
+    const commercialPdf = await this.pdfGenerator.generate(invoice, user);
+    const baseName = invoice.uuid;
+
+    const files: { name: string; data: Buffer | string }[] = [];
+
+    if (invoice.timbradoPdf) {
+      files.push({ name: `${baseName}_timbrado.pdf`, data: invoice.timbradoPdf });
+    }
+
+    files.push({ name: `${baseName}_commercial.pdf`, data: commercialPdf });
+
+    return this.zipPackager.createBundle(files);
   }
 }

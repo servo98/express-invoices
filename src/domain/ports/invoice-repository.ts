@@ -10,4 +10,9 @@ export interface InvoiceRepository {
   update(input: UpdateInvoiceInput): Promise<Invoice>;
   delete(id: string, userId: string): Promise<void>;
   getLatestByUser(userId: string): Promise<Invoice | null>;
+
+  // Unscoped methods for accountant access
+  findByIdUnscoped(id: string): Promise<Invoice | null>;
+  findAllUnscoped(): Promise<Invoice[]>;
+  findAllByYearUnscoped(year: number): Promise<Invoice[]>;
 }

@@ -8,9 +8,6 @@ export class DeleteInvoiceUseCase {
     if (!existing) {
       throw new Error("Invoice not found");
     }
-    if (existing.status === "timbrado") {
-      throw new Error("Cannot delete a timbrado invoice");
-    }
     return this.invoiceRepo.delete(id, userId);
   }
 }

@@ -70,6 +70,9 @@ model User {
   smtpUser      String?
   smtpPass      String?
 
+  // Role
+  role          String    @default("freelancer") // "freelancer" | "accountant"
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -107,6 +110,13 @@ model UserSettings {
   defaultUnidad         String?   @default("Unidad de servicio")
   defaultDescription    String?   @default("Professional software development services")
   defaultRate           Float?    @default(3500)
+
+  // Commercial invoice defaults (Billed To)
+  defaultBilledToName   String?
+  defaultBilledToAddress String?
+  defaultBilledToPhone  String?
+  defaultDescriptionEn  String?
+  clientEmail           String?
 
   // Theme
   theme                 String    @default("dark")
@@ -168,6 +178,10 @@ model Invoice {
   cfdiFechaTimbrado String?
   cfdiNoCertificadoSat String?
   cfdiCadenaOriginal String?
+
+  // Upload flow
+  timbradoPdf     Bytes?
+  uploadedBy      String?
 
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt

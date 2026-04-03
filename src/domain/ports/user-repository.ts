@@ -5,4 +5,7 @@ export interface UserRepository {
   findByEmail(email: string): Promise<User | null>;
   update(input: UpdateUserInput): Promise<User>;
   findAllWithRemindersEnabled(): Promise<User[]>;
+  findAll(): Promise<User[]>;
+  findAllFreelancers(): Promise<User[]>;
+  updateRole(userId: string, role: string): Promise<User>;
 }

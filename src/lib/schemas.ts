@@ -11,34 +11,6 @@ export const invoiceItemSchema = z.object({
   objetoImp: z.string().default("02"),
 });
 
-export const createInvoiceSchema = z.object({
-  month: z.coerce.number().min(1).max(12),
-  year: z.coerce.number().min(2020).max(2100),
-  formaPago: z.string().default("99"),
-  metodoPago: z.string().default("PPD"),
-  moneda: z.string().default("USD"),
-  tipoCambio: z.coerce.number().nullable().optional(),
-  lugarExpedicion: z.string().optional(),
-  exportacion: z.string().default("01"),
-  receptorNombre: z.string().optional(),
-  receptorRfc: z.string().default("XEXX010101000"),
-  receptorCp: z.string().optional(),
-  residenciaFiscal: z.string().optional(),
-  numRegIdTrib: z.string().optional(),
-  regimenFiscalReceptor: z.string().optional(),
-  usoCfdi: z.string().default("S01"),
-  billedToName: z.string().optional(),
-  billedToAddress: z.string().optional(),
-  billedToPhone: z.string().optional(),
-  paymentReference: z.string().optional(),
-  items: z.array(invoiceItemSchema).min(1, "At least one item is required"),
-});
-
-export const updateInvoiceSchema = createInvoiceSchema.partial().extend({
-  id: z.string(),
-  status: z.enum(["draft", "issued", "timbrado", "sent", "paid"]).optional(),
-});
-
 export const updateUserSchema = z.object({
   name: z.string().optional(),
   rfc: z.string().optional(),
@@ -76,10 +48,13 @@ export const updateSettingsSchema = z.object({
   defaultUnidad: z.string().optional(),
   defaultDescription: z.string().optional(),
   defaultRate: z.coerce.number().optional(),
+  defaultBilledToName: z.string().optional(),
+  defaultBilledToAddress: z.string().optional(),
+  defaultBilledToPhone: z.string().optional(),
+  defaultDescriptionEn: z.string().optional(),
+  clientEmail: z.string().optional(),
   theme: z.enum(["light", "dark", "pink"]).optional(),
 });
 
-export type CreateInvoiceInput = z.infer<typeof createInvoiceSchema>;
-export type UpdateInvoiceInput = z.infer<typeof updateInvoiceSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type UpdateSettingsInput = z.infer<typeof updateSettingsSchema>;

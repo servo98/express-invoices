@@ -1,13 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/auth-utils";
+import { requireFreelancer } from "@/lib/auth-utils";
 import { container } from "@/infrastructure/di/container";
 import { updateSettingsSchema, updateUserSchema } from "@/lib/schemas";
 import { db } from "@/lib/db";
 
 export async function updateSettingsAction(formData: FormData) {
-  const user = await requireUser();
+  const user = await requireFreelancer();
   const raw = Object.fromEntries(formData.entries());
 
   // Handle checkbox (reminderEnabled)
@@ -36,7 +36,7 @@ export async function updateSettingsAction(formData: FormData) {
 }
 
 export async function updateProfileAction(formData: FormData) {
-  const user = await requireUser();
+  const user = await requireFreelancer();
   const raw = Object.fromEntries(formData.entries());
 
   const parsed = updateUserSchema.safeParse(raw);
