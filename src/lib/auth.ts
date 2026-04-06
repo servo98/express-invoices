@@ -9,6 +9,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Discord({
       checks: ["state"],
+      client: {
+        token_endpoint_auth_method: "client_secret_post",
+      },
+      token: {
+        url: "https://discord.com/api/oauth2/token",
+        async conform(response: Response) {
+          if (!response.ok) {
+            const text = await response.clone().text();
+            console.error(`[auth][discord] Token error: HTTP ${response.status}`, text.slice(0, 500));
+          }
+          return undefined;
+        },
+      },
     }),
   ],
   pages: {
